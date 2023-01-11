@@ -73,6 +73,7 @@ Boneco: .word 0x00ff82be 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00008000 
 
 main: 	lui $t0, 0x1001
 	lui $t8, 0x1003
+	lui $t9, 0xffff #Onde ficam salvos os inputs
 	jal load
 	
 	lui $t0, 0x1001
@@ -96,7 +97,7 @@ Bomberman:	beq $t4, $0, pulalinha
 		addi $t7, $t7, 4
 		addi $t2, $t2, -1	#contador de pixels
 		addi $t4, $t4, -1	#contador de colunas
-		beq $t2, $0, voltar
+		beq $t2, $0, controle
 		j Bomberman
 
 prox:		addi $t0, $t0, 4
@@ -121,3 +122,61 @@ load:	lw $t1, 0($t0)
 	addi $t2, $t2, 1
 	bne $t2, 8192, load
 	jr $31
+
+
+
+#Teste movimento
+controle: 
+lw $s2, 0($t9)  #Reg 18 e 25
+addi $s7, $0, 'd'
+lw $s6, 20($t9)
+beq $s7, $s6, controledireita
+
+
+
+
+
+
+
+
+
+
+
+
+
+beq $s2, $0, controle
+
+controledireita: 
+		addi $t2, $0, 25 #pixels do bomberman
+		addi $t4, $0, 5 #colunas do bomberman
+		jal Bombermand
+		
+		
+Bombermand:	beq $t4, $0, pulalinhad
+		lw $t3, 0($t7)
+		beq $t3, 0x00dfdfdf, proxd   #Se atentar para cor do cenário (isso ta bloqueando o carregamento)
+		sw $t3, 5196($t0)
+		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		beq $t2, $0, controle
+		j Bombermand
+
+proxd:		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		j Bombermand
+
+pulalinhad: 	addi $t4, $0, 5
+		addi $t0, $t0, 492    #512 - (pixels * 4)
+		addi $t8, $t8, 492
+		j Bombermand
+
+j controle
+
+
+beq $t2, $0, voltar
