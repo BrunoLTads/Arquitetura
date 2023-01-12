@@ -131,6 +131,9 @@ lw $s2, 0($t9)  #Reg 18 e 25
 addi $s7, $0, 'd'
 lw $s6, 20($t9)
 beq $s7, $s6, controledireita
+addi $s5, $0, 'p'
+beq $s5, $s6, load
+
 
 
 
@@ -146,7 +149,10 @@ beq $s7, $s6, controledireita
 
 beq $s2, $0, controle
 
-controledireita: 
+controledireita: sw $0, 0($t9)
+		lui $t0, 0x1001
+		addi $t0, $t0, 20
+		lui $t7, 0x1002
 		addi $t2, $0, 25 #pixels do bomberman
 		addi $t4, $0, 5 #colunas do bomberman
 		jal Bombermand
@@ -154,14 +160,14 @@ controledireita:
 		
 Bombermand:	beq $t4, $0, pulalinhad
 		lw $t3, 0($t7)
-		beq $t3, 0x00dfdfdf, proxd   #Se atentar para cor do cenário (isso ta bloqueando o carregamento)
-		sw $t3, 5196($t0)
+		beq $t3, 0x00FFFFFF, proxd   #Se atentar para cor do cenário (isso ta bloqueando o carregamento)
+		sw $t3, 5216($t0)
 		addi $t0, $t0, 4
 		addi $t8, $t8, 4
 		addi $t7, $t7, 4
 		addi $t2, $t2, -1	#contador de pixels
 		addi $t4, $t4, -1	#contador de colunas
-		beq $t2, $0, controle
+		beq $t2, $0, controle       # load por enquanto, lembrar de mudar pra controle
 		j Bombermand
 
 proxd:		addi $t0, $t0, 4
