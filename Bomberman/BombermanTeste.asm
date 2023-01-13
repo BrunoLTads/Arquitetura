@@ -66,7 +66,31 @@ ln64: .word 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x
 
 Boneco: .word 0x00ff82be 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00008000 0x00FFFFFF 0x00ffcaba 0x00ffcaba 0x00008000 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00ffcaba 0x004100ff 0x004100ff 0x004100ff 0x00ffcaba 0x00008000 0x00ff82be 0x00008000 0x00ff82be 0x00008000
 
-
+#    Oq está armazenado em cada registrador
+#	$t0 - cenário estático
+#	$t1 -
+#	$t2 - Contador de pixels
+#	$t3 -
+#	$t4 - Contador de colunas
+#	$t5 -
+#	$t6 -
+#	$t7 -
+#	$s0 -
+#	$s1 -
+#	$s2 -
+#	$s3 -
+#	$s4 -
+#	$s5 -
+#	$s6 -
+#	$s7 - Personagem
+#	$t8 - cenário para substituição
+#	$t9 - inputs
+#
+#
+#
+#
+#
+#
 
 
 .text
@@ -133,6 +157,10 @@ lw $s6, 4($t9)
 beq $s7, $s6, controledireita
 addi $s7, $0, 'a'
 beq $s7, $s6, controleesquerda
+addi $s7, $0, 'w'
+beq $s7, $s6, controlecima
+addi $s7, $0, 's'
+beq $s7, $s6, controlebaixo
 beq $s2, $0, controle
 
 
@@ -149,7 +177,7 @@ beq $s2, $0, controle
 
 controledireita: sw $0, 0($t9)
 		lui $t0, 0x1001
-		addi $t0, $t0, 20
+		#addi $t0, $t0, 20
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
@@ -160,7 +188,7 @@ controledireita: sw $0, 0($t9)
 Bombermand:	beq $t4, $0, pulalinhad
 		lw $t3, 0($t7)
 		beq $t3, 0x00000000, proxd   #Se atentar para cor do cenário (isso ta bloqueando o carregamento
-		addi $t3, $t3, 20
+		#addi $t3, $t3, 20
 		sw $t3, 5216($t0)
 		addi $t0, $t0, 4
 		addi $t8, $t8, 4
@@ -187,7 +215,7 @@ pulalinhad: 	addi $t4, $0, 5
 		
 controleesquerda: sw $0, 0($t9)
 		lui $t0, 0x1001
-		sub $t0, $t0, 20
+		#sub $t0, $t0, 20
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
@@ -219,6 +247,77 @@ pulalinhae: 	addi $t4, $0, 5
 		addi $t8, $t8, 492
 		j Bombermane
 
+
+controlecima: sw $0, 0($t9)
+		lui $t0, 0x1001
+		#sub $t0, $t0, 2560
+		lui $t7, 0x1002
+		addi $t7, $t7, -32768
+		addi $t2, $0, 25 #pixels do bomberman
+		addi $t4, $0, 5 #colunas do bomberman
+		jal Bombermanc
+		
+		
+Bombermanc:	beq $t4, $0, pulalinhac
+		lw $t3, 0($t7)
+		beq $t3, 0x00000000, proxd   #Se atentar para cor do cenário (isso ta bloqueando o carregamento
+		#addi $t3, $t3, 20
+		sw $t3, 5216($t0)
+		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		beq $t2, $0, controle       # load por enquanto, lembrar de mudar pra controle
+		j Bombermanc
+
+proxc:		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		j Bombermanc
+
+pulalinhac: 	addi $t4, $0, 5
+		addi $t0, $t0, 492    #512 - (pixels * 4)
+		addi $t8, $t8, 492
+		j Bombermanc
+		
+controlebaixo: sw $0, 0($t9)
+		lui $t0, 0x1001
+		#addi $t0, $t0, 2560
+		lui $t7, 0x1002
+		addi $t7, $t7, -32768
+		addi $t2, $0, 25 #pixels do bomberman
+		addi $t4, $0, 5 #colunas do bomberman
+		jal Bombermanb
+		
+		
+Bombermanb:	beq $t4, $0, pulalinhab
+		lw $t3, 0($t7)
+		beq $t3, 0x00000000, proxb   #Se atentar para cor do cenário (isso ta bloqueando o carregamento
+		#addi $t3, $t3, 20
+		sw $t3, 5216($t0)
+		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		beq $t2, $0, controle       # load por enquanto, lembrar de mudar pra controle
+		j Bombermanb
+
+proxb:		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		j Bombermanb
+
+pulalinhab: 	addi $t4, $0, 5
+		addi $t0, $t0, 492    #512 - (pixels * 4)
+		addi $t8, $t8, 492
+		j Bombermanb
+		
 j controle
 
 
