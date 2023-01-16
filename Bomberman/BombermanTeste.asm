@@ -65,6 +65,8 @@ ln63: .word 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x
 ln64: .word 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000
 
 Boneco: .word 0x00ff82be 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00008000 0x00FFFFFF 0x00ffcaba 0x00ffcaba 0x00008000 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00ffcaba 0x004100ff 0x004100ff 0x004100ff 0x00ffcaba 0x00008000 0x00ff82be 0x00008000 0x00ff82be 0x00008000
+Inimigo1: .word 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00FFFFFF 0x00FFFFFF 0x004100ff 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x004100ff 0x00FF0000 0x004100ff 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x004100ff 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000
+
 
 #    Oq está armazenado em cada registrador
 #	$t0 - cenário estático
@@ -77,9 +79,9 @@ Boneco: .word 0x00ff82be 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00008000 
 #	$t7 -
 #	$s0 -
 #	$s1 -
-#	$s2 -
-#	$s3 -
-#	$s4 -
+#	$s2 - comp control
+#	$s3 - guardar 3
+#	$s4 - 
 #	$s5 -
 #	$s6 -
 #	$s7 - Personagem
@@ -109,6 +111,15 @@ main: 	lui $t0, 0x1001
 	addi $t4, $0, 5 #colunas do bomberman
 	jal Bomberman
 	
+	lui $t0, 0x1001
+	lui $t7, 0x1002
+	addi $t7, $t7, -32668
+	
+	lui $t8, 0x1003
+	addi $t2, $0, 25 #pixels total monstro
+	addi $t4, $0, 5 #colunas do bomberman
+	jal inimigo
+	
 fim:	addi $2, $0, 10
 	syscall
 	
@@ -121,7 +132,7 @@ Bomberman:	beq $t4, $0, pulalinha
 		addi $t7, $t7, 4
 		addi $t2, $t2, -1	#contador de pixels
 		addi $t4, $t4, -1	#contador de colunas
-		beq $t2, $0, controle
+		beq $t2, $0, voltar
 		j Bomberman
 
 prox:		addi $t0, $t0, 4
@@ -136,7 +147,34 @@ pulalinha:	addi $t4, $0, 5
 		addi $t8, $t8, 492
 		j Bomberman
 		
+inimigo:	beq $t4, $0, pulalinhaini
+		lw $t3, 0($t7)
+		beq $t3, 0x00000000, proxini   #Se atentar para cor do cenário (isso ta bloqueando o carregamento)
+		sw $t3, 25976($t0)
+		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		beq $t2, $0, controle
+		j inimigo
+		
+proxini:	addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		beq $t2, $t0, controle
+		j inimigo
+		
+pulalinhaini:	addi $t4, $0, 5
+		addi $t0, $t0, 492    #512 - (pixels * 4)
+		addi $t8, $t8, 492
+		j inimigo		
+		
 voltar: jr $31
+
+voltarini: jr $31
 	
 load:	lw $t1, 0($t0)
 	sw $t1, 0($t8)
@@ -148,9 +186,12 @@ load:	lw $t1, 0($t0)
 	jr $31
 
 
-
+	
 #Teste movimento
-controle: 
+controle:
+addi $v0, $0, 32
+addi $a0, $0, 1000
+#syscall
 lw $s2, 0($t9)  #Reg 18 e 25
 addi $s7, $0, 'd'
 lw $s6, 4($t9)
@@ -161,6 +202,14 @@ addi $s7, $0, 'w'
 beq $s7, $s6, controlecima
 addi $s7, $0, 's'
 beq $s7, $s6, controlebaixo
+
+RNG:	addi $v0, $0, 41
+	syscall
+	addi $s3, $0, 3
+	div $a0, $s3
+	mfhi $s1
+
+
 beq $s2, $0, controle
 
 
@@ -172,12 +221,12 @@ beq $s2, $0, controle
 
 
 
-
-
-
-controledireita: sw $0, 0($t9)
+controledireita:
+		sw $0, 0($t9)
 		lui $t0, 0x1001
+		#lw $s5, 0($t0) Testar em casa, meu movimento provavelmente vai da certo a partir daqui
 		addi $t0, $t0, 20
+		#sw $t0, 0($s5)
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
