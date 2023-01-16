@@ -177,7 +177,7 @@ beq $s2, $0, controle
 
 controledireita: sw $0, 0($t9)
 		lui $t0, 0x1001
-		#addi $t0, $t0, 20
+		addi $t0, $t0, 20
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
@@ -215,7 +215,7 @@ pulalinhad: 	addi $t4, $0, 5
 		
 controleesquerda: sw $0, 0($t9)
 		lui $t0, 0x1001
-		#sub $t0, $t0, 20
+		sub $t0, $t0, 20
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
@@ -250,7 +250,7 @@ pulalinhae: 	addi $t4, $0, 5
 
 controlecima: sw $0, 0($t9)
 		lui $t0, 0x1001
-		#sub $t0, $t0, 2560
+		sub $t0, $t0, 2560
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
@@ -285,7 +285,7 @@ pulalinhac: 	addi $t4, $0, 5
 		
 controlebaixo: sw $0, 0($t9)
 		lui $t0, 0x1001
-		#addi $t0, $t0, 2560
+		addi $t0, $t0, 2560
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
