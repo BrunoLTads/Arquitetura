@@ -70,20 +70,20 @@ Inimigo1: .word 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00FFFFF
 
 #    Oq está armazenado em cada registrador
 #	$t0 - cenário estático
-#	$t1 -
+#	$t1 - usando
 #	$t2 - Contador de pixels
-#	$t3 -
+#	$t3 - usando
 #	$t4 - Contador de colunas
 #	$t5 -
 #	$t6 -
-#	$t7 -
+#	$t7 - usando
 #	$s0 -
 #	$s1 -
 #	$s2 - comp control
 #	$s3 - guardar 3
 #	$s4 - 
 #	$s5 -
-#	$s6 -
+#	$s6 - usando
 #	$s7 - Personagem
 #	$t8 - cenário para substituição
 #	$t9 - inputs
@@ -97,7 +97,9 @@ Inimigo1: .word 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00FFFFF
 
 .text
 
-main: 	lui $t0, 0x1001
+main: 	
+	addi $s5, $0, 0
+	lui $t0, 0x1001
 	lui $t8, 0x1003
 	lui $t9, 0xffff #Onde ficam salvos os inputs
 	jal load
@@ -189,10 +191,11 @@ load:	lw $t1, 0($t0)
 	
 #Teste movimento
 controle:
-addi $v0, $0, 32
-addi $a0, $0, 1000
+#addi $v0, $0, 32
+#addi $a0, $0, 1000
 #syscall
-lw $s2, 0($t9)  #Reg 18 e 25
+lw $s2, 0($t9)  #Reg 18 e 25 #Controla loop do controle
+beq $s2, $0, naodig
 addi $s7, $0, 'd'
 lw $s6, 4($t9)
 beq $s7, $s6, controledireita
@@ -202,6 +205,7 @@ addi $s7, $0, 'w'
 beq $s7, $s6, controlecima
 addi $s7, $0, 's'
 beq $s7, $s6, controlebaixo
+j naodig
 
 RNG:	addi $v0, $0, 41
 	syscall
@@ -212,7 +216,7 @@ RNG:	addi $v0, $0, 41
 
 beq $s2, $0, controle
 
-
+naodig: j controle
 
 
 
@@ -222,10 +226,15 @@ beq $s2, $0, controle
 
 
 controledireita:
+		#lui $s0, 0x1004 # transformando $s0 num espaço de memória
 		sw $0, 0($t9)
-		lui $t0, 0x1001
-		#lw $s5, 0($t0) Testar em casa, meu movimento provavelmente vai da certo a partir daqui
-		addi $t0, $t0, 20
+		sw $s0, 0($t0)
+		#lw $s5, 0($s0) #
+		#lw $s5, 0($t0) Testar em casa, meu movimento provavelmente vai da certo a partir daqui#
+		sub $t0, $t0, 2048
+		#add $t0, $t0, $s5 #
+		#sw $t0, 0($s0)#
+		
 		#sw $t0, 0($s5)
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
@@ -262,9 +271,16 @@ pulalinhad: 	addi $t4, $0, 5
 		
 		
 		
-controleesquerda: sw $0, 0($t9)
-		lui $t0, 0x1001
-		sub $t0, $t0, 20
+controleesquerda: #lui $s0, 0x1004 # transformando $s0 num espaço de memória
+		sw $0, 0($t9)
+		sw $s0, 0($t0)
+		#lw $s5, 0($s0) #
+		#lw $s5, 0($t0) Testar em casa, meu movimento provavelmente vai da certo a partir daqui#
+		sub $t0, $t0, 2088
+		#add $t0, $t0, $s5 #
+		#sw $t0, 0($s0)#
+		
+		#sw $t0, 0($s5)
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
@@ -297,9 +313,16 @@ pulalinhae: 	addi $t4, $0, 5
 		j Bombermane
 
 
-controlecima: sw $0, 0($t9)
-		lui $t0, 0x1001
-		sub $t0, $t0, 2560
+controlecima: #lui $s0, 0x1004 # transformando $s0 num espaço de memória
+		sw $0, 0($t9)
+		sw $s0, 0($t0)
+		#lw $s5, 0($s0) #
+		#lw $s5, 0($t0) Testar em casa, meu movimento provavelmente vai da certo a partir daqui#
+		sub $t0, $t0, 4628
+		#add $t0, $t0, $s5 #
+		#sw $t0, 0($s0)#
+		
+		#sw $t0, 0($s5)
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
@@ -332,15 +355,21 @@ pulalinhac: 	addi $t4, $0, 5
 		addi $t8, $t8, 492
 		j Bombermanc
 		
-controlebaixo: sw $0, 0($t9)
-		lui $t0, 0x1001
-		addi $t0, $t0, 2560
+controlebaixo: #lui $s0, 0x1004 # transformando $s0 num espaço de memória
+		sw $0, 0($t9)
+		sw $s0, 0($t0)
+		#lw $s5, 0($s0) #
+		#lw $s5, 0($t0) Testar em casa, meu movimento provavelmente vai da certo a partir daqui#
+		addi $t0, $t0, 492
+		#add $t0, $t0, $s5 #
+		#sw $t0, 0($s0)#
+		
+		#sw $t0, 0($s5)
 		lui $t7, 0x1002
 		addi $t7, $t7, -32768
 		addi $t2, $0, 25 #pixels do bomberman
 		addi $t4, $0, 5 #colunas do bomberman
 		jal Bombermanb
-		
 		
 Bombermanb:	beq $t4, $0, pulalinhab
 		lw $t3, 0($t7)
