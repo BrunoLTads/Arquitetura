@@ -67,7 +67,6 @@ ln64: .word 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x00000000 0x
 Boneco: .word 0x00ff82be 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00008000 0x00FFFFFF 0x00ffcaba 0x00ffcaba 0x00008000 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00ffcaba 0x004100ff 0x004100ff 0x004100ff 0x00ffcaba 0x00008000 0x00ff82be 0x00008000 0x00ff82be 0x00008000
 Inimigo1: .word 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00FFFFFF 0x00FFFFFF 0x004100ff 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x004100ff 0x00FF0000 0x004100ff 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x004100ff 0x00FFFFFF 0x00FFFFFF 0x00008000 0x00FFFFFF 0x00FFFFFF 0x00FFFFFF 0x00008000
 
-
 #    Oq está armazenado em cada registrador
 #	$t0 - cenário estático
 #	$t1 - usando
@@ -166,7 +165,6 @@ proxini:	addi $t0, $t0, 4
 		addi $t7, $t7, 4
 		addi $t2, $t2, -1	#contador de pixels
 		addi $t4, $t4, -1	#contador de colunas
-		beq $t2, $t0, controle
 		j inimigo
 		
 pulalinhaini:	addi $t4, $0, 5
@@ -226,14 +224,13 @@ naodig: j controle
 
 
 controledireita:
+		lw $s0, 5216($t0) #guarda o valor verde no registrador $s0
+		beq $s0, 0x00656565, controle
 		#lui $s0, 0x1004 # transformando $s0 num espaço de memória
 		sw $0, 0($t9)
-		sw $s0, 0($t0)
-		#lw $s5, 0($s0) #
-		#lw $s5, 0($t0) Testar em casa, meu movimento provavelmente vai da certo a partir daqui#
+		#sw $s0, 0($t0)
 		sub $t0, $t0, 2048
-		#add $t0, $t0, $s5 #
-		#sw $t0, 0($s0)#
+		#sw $
 		
 		#sw $t0, 0($s5)
 		lui $t7, 0x1002
@@ -253,7 +250,7 @@ Bombermand:	beq $t4, $0, pulalinhad
 		addi $t7, $t7, 4
 		addi $t2, $t2, -1	#contador de pixels
 		addi $t4, $t4, -1	#contador de colunas
-		beq $t2, $0, controle       # load por enquanto, lembrar de mudar pra controle
+		beq $t2, $0, controle     # load por enquanto, lembrar de mudar pra controle
 		j Bombermand
 
 proxd:		addi $t0, $t0, 4
@@ -271,7 +268,11 @@ pulalinhad: 	addi $t4, $0, 5
 		
 		
 		
-controleesquerda: #lui $s0, 0x1004 # transformando $s0 num espaço de memória
+controleesquerda:
+		#lw $s0, 5220($t0) #guarda o valor verde no registrador $s0
+		#addi $s1, $0, 0x00008000
+		#bne $s0, $s1, controle
+ 		 #lui $s0, 0x1004 # transformando $s0 num espaço de memória
 		sw $0, 0($t9)
 		sw $s0, 0($t0)
 		#lw $s5, 0($s0) #
@@ -313,7 +314,8 @@ pulalinhae: 	addi $t4, $0, 5
 		j Bombermane
 
 
-controlecima: #lui $s0, 0x1004 # transformando $s0 num espaço de memória
+controlecima: 	
+		#lui $s0, 0x1004 # transformando $s0 num espaço de memória
 		sw $0, 0($t9)
 		sw $s0, 0($t0)
 		#lw $s5, 0($s0) #
@@ -397,6 +399,40 @@ pulalinhab: 	addi $t4, $0, 5
 		j Bombermanb
 		
 j controle
+
+inimovesc:	
+		sub $t0, $t0, 20
+		
+		lui $t7, 0x1002
+		addi $t7, $t7, -32668
+		addi $t2, $0, 25 #pixels do bomberman
+		addi $t4, $0, 5 #colunas do bomberman
+		jal inimigoesc
+
+inimigoesc:	beq $t4, $0, pulalinhainiesc
+		lw $t3, 0($t7)
+		beq $t3, 0x00000000, proxiniesc  #Se atentar para cor do cenário (isso ta bloqueando o carregamento)
+		sw $t3, 25976($t0)
+		addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		beq $t2, $0, controle
+		j inimigoesc
+		
+proxiniesc:	addi $t0, $t0, 4
+		addi $t8, $t8, 4
+		addi $t7, $t7, 4
+		addi $t2, $t2, -1	#contador de pixels
+		addi $t4, $t4, -1	#contador de colunas
+		beq $t2, $0, controle
+		j inimigoesc
+		
+pulalinhainiesc:	addi $t4, $0, 5
+		addi $t0, $t0, 492    #512 - (pixels * 4)
+		addi $t8, $t8, 492
+		j inimigoesc		
 
 
 beq $t2, $0, voltar
