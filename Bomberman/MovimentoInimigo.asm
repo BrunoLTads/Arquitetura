@@ -72,9 +72,9 @@ main:
 	addi $23, $0, 5 #altura
 	mul $26 $22 $23 #area
 	addi $26 $26 8192 #tamanho da tela
-	addi $18, $0, 25 #x inicial
+	addi $18, $0, 24 #x inicial
 	addi $19, $0, 50 #y inicial
-	addi $20, $0, 93 #x final
+	addi $20, $0, 94 #x final
 	addi $21, $0, 15 #y final
 	
 	add $27, $0, $18
